@@ -1,0 +1,27 @@
+<svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .word { font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif; font-weight: 800; }
+    </style>
+  </defs>
+
+  <!-- Icon: route pin — a location pin with a curved road through it, evoking a journey -->
+  <g transform="translate(20, 25)">
+    <path d="M55 0
+             C 25 0, 0 24, 0 55
+             C 0 95, 55 110, 55 110
+             C 55 110, 110 95, 110 55
+             C 110 24, 85 0, 55 0 Z"
+          fill="#E67E22"/>
+    <circle cx="55" cy="52" r="30" fill="#FFFFFF"/>
+    <path d="M30 60 C 42 40, 68 40, 80 60"
+          stroke="#2C3E50" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="60" r="5" fill="#2C3E50"/>
+    <circle cx="80" cy="60" r="5" fill="#2C3E50"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="160" y="105" class="word" font-size="72" fill="#2C3E50">Y</text>
+  <text x="200" y="105" class="word" font-size="72" fill="#E67E22">è</text>
+  <text x="232" y="105" class="word" font-size="72" fill="#2C3E50">go</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Rounded square background for app icon -->
+  <rect x="0" y="0" width="200" height="200" rx="44" fill="#2C3E50"/>
+
+  <!-- Route pin icon centered -->
+  <g transform="translate(45, 35)">
+    <path d="M55 0
+             C 25 0, 0 24, 0 55
+             C 0 95, 55 118, 55 118
+             C 55 118, 110 95, 110 55
+             C 110 24, 85 0, 55 0 Z"
+          fill="#E67E22"/>
+    <circle cx="55" cy="52" r="30" fill="#FFFFFF"/>
+    <path d="M30 60 C 42 40, 68 40, 80 60"
+          stroke="#2C3E50" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="60" r="5" fill="#2C3E50"/>
+    <circle cx="80" cy="60" r="5" fill="#2C3E50"/>
+  </g>
+</svg>

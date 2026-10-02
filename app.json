@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Yègo",
+    "slug": "yego",
+    "version": "0.1.0",
+    "scheme": "yego",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.yego.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#2C3E50"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#2C3E50"
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Yègo utilise la caméra pour scanner les billets à l'embarquement."
+        }
+      ],
+      "expo-sharing",
+      [
+        "expo-notifications",
+        {
+          "color": "#F26A21"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Yègo utilise vos photos pour définir votre photo de profil.",
+          "cameraPermission": "Yègo utilise la caméra pour scanner les billets et prendre une photo de profil."
+        }
+      ],
+      "expo-web-browser"
+    ]
+  }
+}

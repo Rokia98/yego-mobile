@@ -1,0 +1,30 @@
+<svg viewBox="0 0 480 160" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .word { font-family: 'Arial Rounded MT Bold', 'Helvetica Rounded', Arial, sans-serif; font-weight: 800; }
+    </style>
+  </defs>
+
+  <!-- Dark background -->
+  <rect x="0" y="0" width="480" height="160" fill="#2C3E50"/>
+
+  <!-- Icon -->
+  <g transform="translate(20, 25)">
+    <path d="M55 0
+             C 25 0, 0 24, 0 55
+             C 0 95, 55 110, 55 110
+             C 55 110, 110 95, 110 55
+             C 110 24, 85 0, 55 0 Z"
+          fill="#E67E22"/>
+    <circle cx="55" cy="52" r="30" fill="#2C3E50"/>
+    <path d="M30 60 C 42 40, 68 40, 80 60"
+          stroke="#FFFFFF" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <circle cx="30" cy="60" r="5" fill="#FFFFFF"/>
+    <circle cx="80" cy="60" r="5" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Wordmark in white/orange for dark background -->
+  <text x="160" y="105" class="word" font-size="72" fill="#FFFFFF">Y</text>
+  <text x="200" y="105" class="word" font-size="72" fill="#E67E22">è</text>
+  <text x="232" y="105" class="word" font-size="72" fill="#FFFFFF">go</text>
+</svg>
