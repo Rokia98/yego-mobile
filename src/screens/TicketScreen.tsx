@@ -113,6 +113,12 @@ export default function TicketScreen({ route, navigation }: Props) {
   const heureStr = trajet ? formatHeure(trajet.heureDepart, locale) : '';
   const prixUnite = trajet ? montant(trajet.prix) : 0;
   const passager = reservation?.passagerNom ?? t.ticket.voyageur;
+  const paiement = reservation?.paiement;
+  const frais = paiement?.fraisService != null ? Number(paiement.fraisService) : 0;
+  const totalPaye = paiement ? Number(paiement.montant) + frais : null;
+  // Pas d'appel dédié ici : le taux se déduit des montants déjà reçus (receipt figé).
+  const pourcentFraisAffiche =
+    paiement && Number(paiement.montant) > 0 ? Math.round((frais / Number(paiement.montant)) * 100) : 0;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -124,6 +130,22 @@ export default function TicketScreen({ route, navigation }: Props) {
         ListHeaderComponent={
           <>
             <BadgePaye texte={t.ticket.paiementConfirme} />
+            {totalPaye != null && frais > 0 && (
+              <View style={styles.recu}>
+                <View style={styles.recuLigne}>
+                  <Text style={styles.recuLabel}>{t.paiement.billets}</Text>
+                  <Text style={styles.recuValeur}>{formatPrix(Number(paiement!.montant), locale)}</Text>
+                </View>
+                <View style={styles.recuLigne}>
+                  <Text style={styles.recuLabel}>{t.paiement.fraisService(pourcentFraisAffiche)}</Text>
+                  <Text style={styles.recuValeur}>{formatPrix(frais, locale)}</Text>
+                </View>
+                <View style={[styles.recuLigne, styles.recuLigneTotal]}>
+                  <Text style={styles.recuLabelTotal}>{t.paiement.total}</Text>
+                  <Text style={styles.recuValeurTotal}>{formatPrix(totalPaye, locale)}</Text>
+                </View>
+              </View>
+            )}
             {erreur && <Text style={styles.erreur}>{erreur}</Text>}
           </>
         }
@@ -265,6 +287,22 @@ const styles = StyleSheet.create({
   },
   payeTexte: { color: COLORS.green, fontWeight: '800', fontSize: 13 },
   erreur: { color: COLORS.danger, fontSize: 13, textAlign: 'center', marginBottom: 12 },
+
+  recu: {
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: 14,
+    marginBottom: 14,
+    gap: 6,
+  },
+  recuLigne: { flexDirection: 'row', justifyContent: 'space-between' },
+  recuLabel: { fontSize: 13, color: COLORS.gray },
+  recuValeur: { fontSize: 13, color: COLORS.dark, fontWeight: '600' },
+  recuLigneTotal: { borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 6, marginTop: 2 },
+  recuLabelTotal: { fontSize: 14, color: COLORS.dark, fontWeight: '800' },
+  recuValeurTotal: { fontSize: 14, color: COLORS.dark, fontWeight: '800' },
 
   billet: {
     backgroundColor: COLORS.white,

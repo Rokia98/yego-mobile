@@ -1,5 +1,5 @@
 import { api } from './client';
-import type { MoyenPaiement, Paiement } from './types';
+import type { FraisServicePaiement, MoyenPaiement, Paiement } from './types';
 
 // L'app choisit un moyen de paiement, jamais un montant. Le montant est
 // recalculé côté serveur (prix du trajet × places).
@@ -13,6 +13,12 @@ export function initierPaiement(
   return api
     .post<Paiement>('/paiements', { reservationId, moyenPaiement, telephonePayeur })
     .then((r) => r.data);
+}
+
+// Taux courant des frais de service (achats en ligne uniquement) — à lire avant
+// paiement pour afficher le détail billets/frais/total (0.29.0).
+export function fraisServicePaiement(): Promise<FraisServicePaiement> {
+  return api.get<FraisServicePaiement>('/paiements/frais-service').then((r) => r.data);
 }
 
 export function statutPaiement(reservationId: number): Promise<Paiement> {

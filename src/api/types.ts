@@ -109,6 +109,14 @@ export interface Paiement {
   actionRequise?: 'redirection' | 'ussd';
   jekoReference?: string | null;
   telephonePayeur?: string | null;
+  // Frais de service (achats en ligne uniquement, 0.29.0) — `montant` reste le
+  // prix des billets seul ; total réellement débité = montant + fraisService.
+  fraisService?: string | null;
+}
+
+// GET /paiements/frais-service — taux courant à afficher avant paiement.
+export interface FraisServicePaiement {
+  pourcent: number;
 }
 
 export interface Ticket {

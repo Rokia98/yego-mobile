@@ -152,6 +152,9 @@ export const fr = {
     verificationEnCours: 'Vérification…',
     operateurRefuse: "L'opérateur a refusé le paiement. Réessayez, éventuellement avec un autre moyen.",
     serviceIndisponible: 'Le service de paiement est momentanément indisponible. Réessayez dans un instant.',
+    billets: 'Billets',
+    fraisService: (pourcent: number) => `Frais de service (${pourcent} %)`,
+    total: 'Total',
     moyens: {
       orange_money: { nom: 'Orange Money', detail: 'Compte Orange Money' },
       mtn_money: { nom: 'MTN MoMo', detail: 'MTN Mobile Money' },
@@ -230,7 +233,8 @@ export const fr = {
     voirLeTrajet: 'Voir le trajet',
     confirmerAnnulationTitre: 'Annuler cette réservation ?',
     confirmerAnnulationTexte:
-      'Frais retenus selon le délai avant le départ : ≥ 3 j : 10 % · 1–2 j : 25 % · jour J : 50 % · départ passé : aucun remboursement.',
+      'Frais retenus selon le délai avant le départ : ≥ 3 j : 10 % · 1–2 j : 25 % · jour J : 50 % · départ passé : aucun remboursement. Le barème s’applique sur le prix des billets seul : les frais de service (achat en ligne) ne sont jamais remboursés.',
+    fraisServiceNonRembourse: 'Frais de service non remboursables',
     annulationEnregistreeTitre: 'Annulation enregistrée',
     annulationEnregistreeTexte: (montant: string, frais: string) =>
       `Remboursement de ${montant} en attente (frais retenus : ${frais}).`,
@@ -527,6 +531,9 @@ export const en: Dictionnaire = {
     verificationEnCours: 'Checking…',
     operateurRefuse: 'The operator declined the payment. Try again, possibly with another method.',
     serviceIndisponible: 'The payment service is temporarily unavailable. Try again shortly.',
+    billets: 'Tickets',
+    fraisService: (pourcent: number) => `Service fee (${pourcent}%)`,
+    total: 'Total',
     moyens: {
       orange_money: { nom: 'Orange Money', detail: 'Orange Money account' },
       mtn_money: { nom: 'MTN MoMo', detail: 'MTN Mobile Money' },
@@ -605,7 +612,8 @@ export const en: Dictionnaire = {
     voirLeTrajet: 'View trip',
     confirmerAnnulationTitre: 'Cancel this booking?',
     confirmerAnnulationTexte:
-      'Fees withheld based on time before departure: ≥ 3 d: 10% · 1–2 d: 25% · same day: 50% · past departure: no refund.',
+      'Fees withheld based on time before departure: ≥ 3 d: 10% · 1–2 d: 25% · same day: 50% · past departure: no refund. The schedule applies to the ticket price only: the service fee (online purchase) is never refunded.',
+    fraisServiceNonRembourse: 'Service fee not refundable',
     annulationEnregistreeTitre: 'Cancellation recorded',
     annulationEnregistreeTexte: (montant: string, frais: string) =>
       `Refund of ${montant} pending (fees withheld: ${frais}).`,

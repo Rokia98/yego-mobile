@@ -19,6 +19,7 @@ import {
   verifierPaiementRepete,
   simulerPaiement,
   statutPaiement,
+  fraisServicePaiement,
 } from '../api/paiements';
 import { extraireMessage } from '../api/erreurs';
 import { onRetourPaiement } from '../api/events';
@@ -65,6 +66,10 @@ export default function PaiementScreen({ route, navigation }: Props) {
   const [urlOperateur, setUrlOperateur] = useState<string | null>(null);
   const [verificationManuelle, setVerificationManuelle] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
+  // Taux des frais de service (achats en ligne) et dernier paiement connu — dès
+  // qu'un paiement existe, `montant`/`fraisService` (serveur) priment sur l'estimation.
+  const [pourcentFrais, setPourcentFrais] = useState<number | null>(null);
+  const [paiementActuel, setPaiementActuel] = useState<Paiement | null>(null);
   const signal = useRef({ annule: false });
 
   useEffect(() => {
@@ -75,6 +80,7 @@ export default function PaiementScreen({ route, navigation }: Props) {
   }, []);
 
   function demarrerDepuisPaiement(p: Paiement) {
+    setPaiementActuel(p);
     if (p.jekoReference) {
       setModeAttente(p.actionRequise === 'redirection' ? 'redirection' : 'ussd');
       setUrlOperateur(p.urlPaiement ?? null);
@@ -87,12 +93,21 @@ export default function PaiementScreen({ route, navigation }: Props) {
     }
   }
 
+  // Taux des frais de service (achats en ligne) — pour l'estimation avant paiement ;
+  // une fois un paiement initié, `paiementActuel.fraisService` (serveur) prime.
+  useEffect(() => {
+    fraisServicePaiement()
+      .then((r) => setPourcentFrais(r.pourcent))
+      .catch(() => {});
+  }, []);
+
   // La réservation peut déjà porter un paiement (reprise depuis « Mes trajets »).
   useEffect(() => {
     let vivant = true;
     statutPaiement(reservationId)
       .then((p) => {
         if (!vivant) return;
+        setPaiementActuel(p);
         if (p.statut === 'paye') {
           navigation.replace('Ticket', { reservationId, nombrePlaces });
         } else if (p.statut === 'en_attente') {
@@ -173,6 +188,7 @@ export default function PaiementScreen({ route, navigation }: Props) {
     setVerificationManuelle(true);
     try {
       const p = await verifierPaiement(reservationId);
+      setPaiementActuel(p);
       if (p.statut === 'paye') {
         vibrer.succes();
         navigation.replace('Ticket', { reservationId, nombrePlaces });
@@ -238,6 +254,7 @@ export default function PaiementScreen({ route, navigation }: Props) {
       // POST /paiements est idempotent : réutilise le paiement existant
       // ('en_attente' ou 'echoue' relancé avec le même moyen+numéro), crée sinon.
       const reponse = await initierPaiement(reservationId, moyen, telephonePourApi(telephonePayeur));
+      setPaiementActuel(reponse);
       if (reponse.jekoReference) {
         const mode: ModeAttente = reponse.actionRequise === 'redirection' ? 'redirection' : 'ussd';
         setModeAttente(mode);
@@ -266,12 +283,37 @@ export default function PaiementScreen({ route, navigation }: Props) {
 
   const telephonePayeurAffiche = formatTelephone(telephonePayeur);
 
+  // `paiementActuel` (serveur) prime dès qu'il existe ; sinon on estime depuis le
+  // taux courant (`pourcentFrais`) appliqué au montant passé par l'écran précédent.
+  const billets = paiementActuel ? Number(paiementActuel.montant) : montantEstime;
+  const frais =
+    paiementActuel?.fraisService != null
+      ? Number(paiementActuel.fraisService)
+      : pourcentFrais
+        ? Math.round((montantEstime * pourcentFrais) / 100)
+        : 0;
+  const totalAPayer = billets + frais;
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView contentContainerStyle={styles.contenu} showsVerticalScrollIndicator={false}>
         <Card style={styles.recap} ombre>
           <Text style={styles.recapLabel}>{t.paiement.montantAPayer}</Text>
-          <Text style={styles.recapMontant}>{formatPrix(montantEstime, locale)}</Text>
+          {frais > 0 && (
+            <View style={styles.recapDetail}>
+              <View style={styles.recapLigne}>
+                <Text style={styles.recapLigneLabel}>{t.paiement.billets}</Text>
+                <Text style={styles.recapLigneValeur}>{formatPrix(billets, locale)}</Text>
+              </View>
+              <View style={styles.recapLigne}>
+                <Text style={styles.recapLigneLabel}>
+                  {t.paiement.fraisService(pourcentFrais ?? 0)}
+                </Text>
+                <Text style={styles.recapLigneValeur}>{formatPrix(frais, locale)}</Text>
+              </View>
+            </View>
+          )}
+          <Text style={styles.recapMontant}>{formatPrix(totalAPayer, locale)}</Text>
           <View style={styles.recapMeta}>
             <View style={styles.recapChip}>
               <Ionicons name="person-outline" size={13} color={COLORS.gray} />
@@ -414,7 +456,7 @@ export default function PaiementScreen({ route, navigation }: Props) {
       {etat === 'choix' && (
         <View style={styles.pied}>
           <Button
-            titre={t.paiement.payer(formatPrix(montantEstime, locale))}
+            titre={t.paiement.payer(formatPrix(totalAPayer, locale))}
             icone="lock-closed"
             onPress={payer}
             desactive={!moyen}
@@ -432,6 +474,10 @@ const styles = StyleSheet.create({
   recap: { alignItems: 'center', marginBottom: 24, padding: 22 },
   recapLabel: { fontSize: 13, color: COLORS.gray },
   recapMontant: { fontSize: 30, fontWeight: '800', color: COLORS.dark, marginVertical: 6 },
+  recapDetail: { alignSelf: 'stretch', marginTop: 8, gap: 4 },
+  recapLigne: { flexDirection: 'row', justifyContent: 'space-between' },
+  recapLigneLabel: { fontSize: 13, color: COLORS.gray },
+  recapLigneValeur: { fontSize: 13, color: COLORS.dark, fontWeight: '600' },
   recapMeta: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginTop: 4 },
   recapChip: {
     flexDirection: 'row',

@@ -68,11 +68,16 @@ function LigneRemboursement({
   }[remb.statut];
 
   return (
-    <View style={styles.ligne}>
-      <Ionicons name="cash-outline" size={14} color={infos.couleur} />
-      <Text style={[styles.ligneTexte, { color: infos.couleur, fontWeight: '700' }]} numberOfLines={1}>
-        {infos.texte}
-        {remb.statut === 'echoue' && remb.motifEchec ? ` · ${remb.motifEchec}` : ''}
+    <View style={{ gap: 2 }}>
+      <View style={styles.ligne}>
+        <Ionicons name="cash-outline" size={14} color={infos.couleur} />
+        <Text style={[styles.ligneTexte, { color: infos.couleur, fontWeight: '700' }]} numberOfLines={1}>
+          {infos.texte}
+          {remb.statut === 'echoue' && remb.motifEchec ? ` · ${remb.motifEchec}` : ''}
+        </Text>
+      </View>
+      <Text style={styles.ligneNote} numberOfLines={1}>
+        {t.mesTrajets.fraisServiceNonRembourse}
       </Text>
     </View>
   );
@@ -333,6 +338,7 @@ const styles = StyleSheet.create({
   badgeTexte: { fontSize: 11, fontWeight: '700' },
   ligne: { flexDirection: 'row', alignItems: 'center', gap: 7 },
   ligneTexte: { fontSize: 13, color: COLORS.gray, flex: 1 },
+  ligneNote: { fontSize: 11, color: COLORS.grayClair, marginLeft: 21 },
   actions: { marginTop: 12, gap: 4 },
   actionsPrimaires: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   actionPrimaire: {
