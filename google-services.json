@@ -1,0 +1,19 @@
+{
+  "project_info": {
+    "project_number": "250964963603",
+    "project_id": "yego-5ec5c",
+    "storage_bucket": "yego-5ec5c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:250964963603:android:c832a4de6e29da2205aae6",
+        "android_client_info": { "package_name": "com.compagny.yego" }
+      },
+      "oauth_client": [],
+      "api_key": [ { "current_key": "AIzaSyD9mPqNdi9AMv7QziKDS0y4C9TVG2Y_CUU" } ],
+      "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+    }
+  ],
+  "configuration_version": "1"
+}

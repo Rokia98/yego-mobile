@@ -11,7 +11,8 @@
       "supportsTablet": false
     },
     "android": {
-      "package": "com.yego.app",
+      "package": "com.compagny.yego",
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#2C3E50"
