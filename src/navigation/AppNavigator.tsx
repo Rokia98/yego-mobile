@@ -19,6 +19,7 @@ import SuiviScreen from '../screens/SuiviScreen';
 import NotificationsScreen from '../screens/NotificationsScreen';
 import EditProfilScreen from '../screens/EditProfilScreen';
 import AccesRestreintScreen from '../screens/AccesRestreintScreen';
+import MotDePasseObligatoireScreen from '../screens/MotDePasseObligatoireScreen';
 import SupportScreen from '../screens/SupportScreen';
 import NouvelleDemandeScreen from '../screens/NouvelleDemandeScreen';
 import DemandeDetailScreen from '../screens/DemandeDetailScreen';
@@ -26,6 +27,7 @@ import DemandeDetailScreen from '../screens/DemandeDetailScreen';
 export type RootStackParamList = {
   Onboarding: undefined;
   Login: undefined;
+  MotDePasseObligatoire: undefined;
   Main: NavigatorScreenParams<TabParamList> | undefined;
   Reservation: { depart: string; arrivee: string; date: string; passagers: number };
   ChoixPlaces: {
@@ -74,7 +76,7 @@ const enTete = {
 };
 
 export default function AppNavigator() {
-  const { session, onboardingVu } = useAuth();
+  const { session, onboardingVu, motDePasseRequis } = useAuth();
   const { t } = useLangue();
   const role = session?.role;
 
@@ -95,6 +97,10 @@ export default function AppNavigator() {
           ) : (
             <Stack.Screen name="Login" component={LoginScreen} options={{ animation: 'fade' }} />
           )
+        ) : motDePasseRequis ? (
+          // Mot de passe temporaire (0.29.0) : bloque tout le reste de l'app,
+          // quel que soit le rôle — l'API refuse (403) toute autre route protégée.
+          <Stack.Screen name="MotDePasseObligatoire" component={MotDePasseObligatoireScreen} options={{ animation: 'fade' }} />
         ) : role === 'agent' ? (
           <>
             <Stack.Screen name="Main" component={AgentNavigator} options={{ animation: 'fade' }} />

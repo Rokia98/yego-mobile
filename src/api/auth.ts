@@ -2,9 +2,9 @@ import { api, setAccessToken } from './client';
 import { secure } from './secure';
 import { retirerAppareil } from './appareils';
 import { preferences } from '../storage';
-import type { Session } from './types';
+import type { Jetons, Session } from './types';
 
-async function etablirSession(data: Session) {
+async function etablirSession(data: Jetons) {
   setAccessToken(data.accessToken);
   await secure.setRefresh(data.refreshToken);
 }
@@ -44,6 +44,21 @@ export async function restaurerSession(): Promise<Session | null> {
     await secure.clear();
     return null;
   }
+}
+
+// 0.29.0 : PATCH /utilisateurs/:id n'accepte plus `motDePasse`. Seule cette
+// route change le mot de passe — exige l'ancien (401 si faux), renvoie des
+// jetons neufs à installer tout de suite (les autres sessions sont révoquées).
+export async function changerMotDePasse(
+  ancienMotDePasse: string,
+  nouveauMotDePasse: string,
+): Promise<Jetons> {
+  const { data } = await api.patch<Jetons>('/auth/mot-de-passe', {
+    ancienMotDePasse,
+    nouveauMotDePasse,
+  });
+  await etablirSession(data);
+  return data;
 }
 
 export async function deconnexion(): Promise<void> {

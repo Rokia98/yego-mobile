@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../config';
 import { secure } from './secure';
-import { emitLogout } from './events';
+import { emitLogout, emitMotDePasseRequis } from './events';
 
 let accessToken: string | null = null;
 export const setAccessToken = (t: string | null) => {
@@ -41,6 +41,13 @@ api.interceptors.response.use(
   async (error) => {
     const original = error.config;
     const estAuth = original?.url?.includes('/auth/');
+
+    // Mot de passe temporaire (0.29.0) : toute route protégée peut renvoyer ce
+    // 403, sauf PATCH /auth/mot-de-passe, POST /auth/logout-all et
+    // GET /utilisateurs/:id — l'app bascule sur l'écran de changement forcé.
+    if (error.response?.status === 403 && error.response?.data?.code === 'MOT_DE_PASSE_A_CHANGER') {
+      emitMotDePasseRequis();
+    }
 
     if (error.response?.status !== 401 || original?._retry || estAuth || !original) {
       throw error;

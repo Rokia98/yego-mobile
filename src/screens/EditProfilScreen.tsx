@@ -21,18 +21,25 @@ import { vibrer } from '../haptics';
 import { COLORS, SPACING } from '../theme';
 
 export default function EditProfilScreen() {
-  const { session } = useAuth();
+  const { session, changerMotDePasse } = useAuth();
   const { profil, rafraichir } = useProfil();
   const { t } = useLangue();
 
   const [nom, setNom] = useState(profil?.nom ?? '');
   const [email, setEmail] = useState(profil?.email ?? '');
-  const [motDePasse, setMotDePasse] = useState('');
   const [photoLocale, setPhotoLocale] = useState<string | null>(null);
   const [chargementPhoto, setChargementPhoto] = useState(true);
   const [envoiPhoto, setEnvoiPhoto] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
   const [enCours, setEnCours] = useState(false);
+
+  // Changement de mot de passe : flux séparé depuis 0.29.0 (PATCH /auth/mot-de-passe,
+  // exige l'ancien mot de passe) — plus une simple case du formulaire profil.
+  const [motDePasseActuel, setMotDePasseActuel] = useState('');
+  const [nouveauMotDePasse, setNouveauMotDePasse] = useState('');
+  const [confirmationMotDePasse, setConfirmationMotDePasse] = useState('');
+  const [erreurMotDePasse, setErreurMotDePasse] = useState<string | null>(null);
+  const [enCoursMotDePasse, setEnCoursMotDePasse] = useState(false);
 
   const telephone = formatTelephoneAffichage(profil?.telephone ?? session?.telephone);
 
@@ -125,10 +132,6 @@ export default function EditProfilScreen() {
       setErreur(t.modifierProfil.emailInvalide);
       return;
     }
-    if (motDePasse && motDePasse.length < 6) {
-      setErreur(t.modifierProfil.motDePasseCourt);
-      return;
-    }
 
     setEnCours(true);
     try {
@@ -136,17 +139,41 @@ export default function EditProfilScreen() {
       await modifierProfil(session.utilisateurId, {
         nom: nomPropre,
         email: emailPropre || undefined,
-        motDePasse: motDePasse || undefined,
       });
       await rafraichir();
       vibrer.succes();
       Alert.alert(t.modifierProfil.succesTitre, t.modifierProfil.succesTexte);
-      setMotDePasse('');
     } catch (e) {
       vibrer.erreur();
       setErreur(extraireMessage(e));
     } finally {
       setEnCours(false);
+    }
+  }
+
+  async function changerLeMotDePasse() {
+    setErreurMotDePasse(null);
+    if (nouveauMotDePasse.length < 8) {
+      setErreurMotDePasse(t.modifierProfil.motDePasseCourt);
+      return;
+    }
+    if (nouveauMotDePasse !== confirmationMotDePasse) {
+      setErreurMotDePasse(t.modifierProfil.motDePasseDifferents);
+      return;
+    }
+    setEnCoursMotDePasse(true);
+    try {
+      await changerMotDePasse(motDePasseActuel, nouveauMotDePasse);
+      setMotDePasseActuel('');
+      setNouveauMotDePasse('');
+      setConfirmationMotDePasse('');
+      vibrer.succes();
+      Alert.alert(t.modifierProfil.motDePasseChangeTitre, t.modifierProfil.motDePasseChangeTexte);
+    } catch (e) {
+      vibrer.erreur();
+      setErreurMotDePasse(extraireMessage(e));
+    } finally {
+      setEnCoursMotDePasse(false);
     }
   }
 
@@ -198,6 +225,7 @@ export default function EditProfilScreen() {
             autoCapitalize="none"
             keyboardType="email-address"
             placeholder={t.modifierProfil.emailPlaceholder}
+            erreur={erreur}
             returnKeyType="next"
           />
           <Field
@@ -208,25 +236,53 @@ export default function EditProfilScreen() {
             style={styles.champDesactive}
           />
           <Text style={styles.noteTelephone}>{t.modifierProfil.telephoneNote}</Text>
-
-          <Field
-            label={t.modifierProfil.nouveauMotDePasse}
-            icone="lock-closed-outline"
-            value={motDePasse}
-            onChangeText={setMotDePasse}
-            secureTextEntry
-            autoCapitalize="none"
-            placeholder={t.modifierProfil.motDePasseNote}
-            erreur={erreur}
-            returnKeyType="done"
-            onSubmitEditing={enregistrer}
-          />
         </Card>
 
         <Button
           titre={enCours ? t.commun.enregistrementEnCours : t.commun.enregistrer}
           onPress={enregistrer}
           chargement={enCours}
+          style={styles.bouton}
+        />
+
+        <Text style={styles.titreSection}>{t.modifierProfil.motDePasseSection}</Text>
+        <Card style={styles.carte}>
+          <Field
+            label={t.modifierProfil.motDePasseActuel}
+            icone="lock-closed-outline"
+            value={motDePasseActuel}
+            onChangeText={setMotDePasseActuel}
+            secureTextEntry
+            autoCapitalize="none"
+            returnKeyType="next"
+          />
+          <Field
+            label={t.modifierProfil.nouveauMotDePasse}
+            icone="lock-closed-outline"
+            value={nouveauMotDePasse}
+            onChangeText={setNouveauMotDePasse}
+            secureTextEntry
+            autoCapitalize="none"
+            returnKeyType="next"
+          />
+          <Field
+            label={t.modifierProfil.confirmerMotDePasse}
+            icone="lock-closed-outline"
+            value={confirmationMotDePasse}
+            onChangeText={setConfirmationMotDePasse}
+            secureTextEntry
+            autoCapitalize="none"
+            erreur={erreurMotDePasse}
+            returnKeyType="done"
+            onSubmitEditing={changerLeMotDePasse}
+          />
+        </Card>
+
+        <Button
+          titre={enCoursMotDePasse ? t.commun.enregistrementEnCours : t.modifierProfil.changerMotDePasseBouton}
+          variante="secondaire"
+          onPress={changerLeMotDePasse}
+          chargement={enCoursMotDePasse}
           style={styles.bouton}
         />
       </ScrollView>
@@ -274,6 +330,7 @@ const styles = StyleSheet.create({
   lienPhoto: { color: COLORS.orange, fontWeight: '700', fontSize: 13, marginTop: 6 },
   notePhoto: { color: COLORS.grayClair, fontSize: 11, textAlign: 'center', maxWidth: 220 },
   carte: { padding: 18, gap: 2 },
+  titreSection: { fontSize: 13, fontWeight: '700', color: COLORS.gray, marginTop: 28, marginBottom: 10 },
   champDesactive: { color: COLORS.grayClair },
   noteTelephone: { fontSize: 11, color: COLORS.grayClair, marginTop: -8, marginBottom: 14 },
   bouton: { marginTop: 20 },

@@ -13,6 +13,13 @@ export interface Session {
   role: Role;
 }
 
+// Réponse de PATCH /auth/mot-de-passe : juste des jetons neufs à installer
+// (les autres sessions sont révoquées côté serveur) — pas le reste de Session.
+export interface Jetons {
+  accessToken: string;
+  refreshToken: string;
+}
+
 export interface CompagnieBref {
   id: number;
   nom: string;

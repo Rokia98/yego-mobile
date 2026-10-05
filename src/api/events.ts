@@ -29,3 +29,18 @@ export function onRetourPaiement(fn: EcouteurRetourPaiement): () => void {
 export function emitRetourPaiement(reservationId: number): void {
   ecouteursRetourPaiement.forEach((fn) => fn(reservationId));
 }
+
+// Toute route protégée peut renvoyer 403 { code: 'MOT_DE_PASSE_A_CHANGER' }
+// quand le compte a un mot de passe temporaire (0.29.0) — le client
+// (api/client.ts) émet ceci dès qu'il voit ce code, pour que l'app bascule
+// immédiatement sur l'écran de changement de mot de passe obligatoire.
+const ecouteursMotDePasseRequis = new Set<Ecouteur>();
+
+export function onMotDePasseRequis(fn: Ecouteur): () => void {
+  ecouteursMotDePasseRequis.add(fn);
+  return () => ecouteursMotDePasseRequis.delete(fn);
+}
+
+export function emitMotDePasseRequis(): void {
+  ecouteursMotDePasseRequis.forEach((fn) => fn());
+}

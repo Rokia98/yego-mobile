@@ -10,9 +10,11 @@ export function monProfil(id: number): Promise<Utilisateur> {
 // Champ OMIS = inchangé ; `photoUrl: null` explicite = retire la photo (le serveur
 // distingue les deux — ne pas envoyer `null` par erreur pour un champ qu'on ne
 // touche pas).
+// Depuis 0.29.0 : `motDePasse` n'est plus accepté ici (400) — voir
+// `changerMotDePasse` dans api/auth.ts (PATCH /auth/mot-de-passe).
 export function modifierProfil(
   id: number,
-  champs: { nom?: string; email?: string; motDePasse?: string; photoUrl?: string | null },
+  champs: { nom?: string; email?: string; photoUrl?: string | null },
 ): Promise<Utilisateur> {
   return api.patch<Utilisateur>(`/utilisateurs/${id}`, champs).then((r) => r.data);
 }
