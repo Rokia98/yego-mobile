@@ -36,3 +36,18 @@ export function suiviHistorique(
     .get<{ points: PointSuivi[] }>(`/departs/${departId}/suivi/historique`, { params: opts })
     .then((r) => r.data.points);
 }
+
+// Agent : départs de sa compagnie à proposer avant de scanner (écran de
+// sélection du départ). `du`/`au` au format YYYY-MM-DD — passer la veille à
+// `du` couvre les cars de nuit embarqués après minuit (même règle que le
+// contrôle de date côté serveur sur /tickets/valider). Route publique (pas de
+// garde sur GET /departs), mais `compagnieId` scope déjà le résultat.
+export function departsCompagnie(
+  compagnieId: number,
+  du: string,
+  au: string,
+): Promise<DepartResultat[]> {
+  return api
+    .get<DepartResultat[]>('/departs', { params: { compagnieId, du, au, ordre: 'asc', take: 50 } })
+    .then((r) => r.data);
+}

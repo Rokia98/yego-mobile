@@ -2,18 +2,22 @@ import React, { useRef, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Ionicons } from '@expo/vector-icons';
+import type { AgentValiderStackParamList } from '../../navigation/AgentValiderNavigator';
 import { COLORS, RADIUS } from '../../theme';
 import Button from '../../components/Button';
-import TopBar from '../../components/TopBar';
+import BoutonRetour from '../../components/BoutonRetour';
 import { validerTicket } from '../../api/tickets';
 import { extraireMessage } from '../../api/erreurs';
 import { useLangue } from '../../i18n';
 import { vibrer } from '../../haptics';
 
 type Resultat = { valide: boolean; message: string };
+type Props = NativeStackScreenProps<AgentValiderStackParamList, 'Scan'>;
 
-export default function ValiderScreen() {
+export default function ValiderScreen({ route }: Props) {
+  const { departId, routeLabel } = route.params;
   const { t } = useLangue();
   const [permission, demanderPermission] = useCameraPermissions();
   const [enCours, setEnCours] = useState(false);
@@ -25,7 +29,7 @@ export default function ValiderScreen() {
     dernierCode.current = codeQr;
     setEnCours(true);
     try {
-      const r = await validerTicket(codeQr);
+      const r = await validerTicket(codeQr, departId);
       if (r.valide) vibrer.succes();
       else vibrer.erreur();
       setResultat({
@@ -48,7 +52,10 @@ export default function ValiderScreen() {
   if (!permission) {
     return (
       <SafeAreaView style={styles.page} edges={['top']}>
-        <TopBar />
+        <View style={styles.enTete}>
+          <BoutonRetour />
+          <Text style={styles.enTeteTexte} numberOfLines={1}>{routeLabel}</Text>
+        </View>
         <View style={styles.centre}>
           <ActivityIndicator color={COLORS.orange} />
         </View>
@@ -59,7 +66,10 @@ export default function ValiderScreen() {
   if (!permission.granted) {
     return (
       <SafeAreaView style={styles.page} edges={['top']}>
-        <TopBar />
+        <View style={styles.enTete}>
+          <BoutonRetour />
+          <Text style={styles.enTeteTexte} numberOfLines={1}>{routeLabel}</Text>
+        </View>
         <View style={styles.centre}>
           <Ionicons name="camera-outline" size={48} color={COLORS.grayClair} />
           <Text style={styles.permTitre}>{t.agent.accesCameraTitre}</Text>
@@ -72,7 +82,10 @@ export default function ValiderScreen() {
 
   return (
     <SafeAreaView style={styles.page} edges={['top']}>
-      <TopBar />
+      <View style={styles.enTete}>
+        <BoutonRetour />
+        <Text style={styles.enTeteTexte} numberOfLines={1}>{routeLabel}</Text>
+      </View>
       <View style={styles.container}>
         <CameraView
           style={StyleSheet.absoluteFill}
@@ -117,6 +130,15 @@ export default function ValiderScreen() {
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: COLORS.background },
+  enTete: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    backgroundColor: COLORS.background,
+  },
+  enTeteTexte: { flex: 1, fontSize: 15, fontWeight: '800', color: COLORS.dark },
   container: { flex: 1, backgroundColor: '#000', overflow: 'hidden' },
   centre: {
     flex: 1,

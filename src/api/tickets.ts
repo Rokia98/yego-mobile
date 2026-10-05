@@ -20,9 +20,18 @@ export function mesTickets(skip = 0, take = 50): Promise<Ticket[]> {
   return api.get<Ticket[]>('/tickets', { params: { skip, take } }).then((r) => r.data);
 }
 
-// Agent : valider un billet à l'embarquement.
-export function validerTicket(codeQr: string): Promise<{ valide: boolean; message?: string }> {
-  return api.post(`/tickets/valider/${encodeURIComponent(codeQr)}`).then((r) => r.data);
+// Agent : valider un billet à l'embarquement. `departId` (recommandé, 0.29.1) :
+// le départ en cours d'embarquement — un ticket d'un autre départ est refusé ;
+// sans lui, seule la date est contrôlée côté serveur.
+export function validerTicket(
+  codeQr: string,
+  departId?: number,
+): Promise<{ valide: boolean; message?: string }> {
+  return api
+    .post(`/tickets/valider/${encodeURIComponent(codeQr)}`, undefined, {
+      params: departId ? { departId } : undefined,
+    })
+    .then((r) => r.data);
 }
 
 // Agent : historique des scans à l'embarquement (ses propres scans ;

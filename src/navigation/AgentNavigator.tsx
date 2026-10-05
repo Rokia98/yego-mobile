@@ -3,7 +3,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { COLORS } from '../theme';
 import { useLangue } from '../i18n';
-import ValiderScreen from '../screens/agent/ValiderScreen';
+import AgentValiderNavigator from './AgentValiderNavigator';
 import HistoriqueScansScreen from '../screens/agent/HistoriqueScansScreen';
 import ProfilScreen from '../screens/ProfilScreen';
 
@@ -31,7 +31,7 @@ export default function AgentNavigator() {
     >
       <Tab.Screen
         name="Valider"
-        component={ValiderScreen}
+        component={AgentValiderNavigator}
         options={{
           title: t.tabs.valider,
           tabBarIcon: ({ color, size }) => (

@@ -286,6 +286,10 @@ export const fr = {
       mauvaise_date: 'Mauvaise date',
       scan: 'Scan',
     },
+    selectionDepartTitre: 'Choisir le départ',
+    selectionDepartSousTitre: (n: number) => `${n} départ${n > 1 ? 's' : ''} à embarquer`,
+    aucunDepart: 'Aucun départ',
+    aucunDepartTexte: "Aucun départ aujourd'hui ou hier pour votre compagnie.",
   },
 
   profil: {
@@ -678,6 +682,10 @@ export const en: Dictionnaire = {
       mauvaise_date: 'Wrong date',
       scan: 'Scan',
     },
+    selectionDepartTitre: 'Choose the departure',
+    selectionDepartSousTitre: (n: number) => `${n} departure${n > 1 ? 's' : ''} to board`,
+    aucunDepart: 'No departures',
+    aucunDepartTexte: 'No departure today or yesterday for your company.',
   },
 
   profil: {
