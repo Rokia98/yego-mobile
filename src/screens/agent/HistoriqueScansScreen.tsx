@@ -29,6 +29,8 @@ function styleResultat(
       return { texte: t.agent.resultats.introuvable, couleur: COLORS.danger, fond: '#FCEBEA', icone: 'help' };
     case 'refuse_hors_compagnie':
       return { texte: t.agent.resultats.refuse_hors_compagnie, couleur: COLORS.danger, fond: '#FCEBEA', icone: 'ban' };
+    case 'mauvaise_date':
+      return { texte: t.agent.resultats.mauvaise_date, couleur: COLORS.danger, fond: '#FCEBEA', icone: 'calendar' };
     default:
       return { texte: t.agent.resultats.scan, couleur: COLORS.gray, fond: '#ECEFF1', icone: 'ellipse' };
   }

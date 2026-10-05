@@ -139,7 +139,11 @@ export type ResultatScan =
   | 'deja_utilise'
   | 'annule'
   | 'introuvable'
-  | 'refuse_hors_compagnie';
+  | 'refuse_hors_compagnie'
+  // 0.29.1 : un ticket n'est validé que le jour de son départ (ou la veille
+  // pour un car de nuit embarqué après minuit) — sinon rejeté avec ce résultat
+  // dans l'audit (GET /tickets/validations).
+  | 'mauvaise_date';
 
 // Un scan de l'historique agent (GET /tickets/validations). Un même billet peut
 // apparaître plusieurs fois (scans successifs). `reservation` est null si le
