@@ -10,21 +10,29 @@ import { emitRetourPaiement } from './api/events';
 // sans erreur : le polling déjà en place dans PaiementScreen prend le relais.
 function traiterUrl(url: string | null): void {
   if (!url) return;
-  // Analyse manuelle plutôt que `URL` (support incertain selon le moteur JS
-  // embarqué) : "yego://paiement?reservationId=123&..." → chemin + requête.
-  const [avantQuery, query = ''] = url.split('?');
-  const chemin = avantQuery.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').replace(/^\/+|\/+$/g, '');
-  if (chemin !== 'paiement') return;
+  // `url` peut venir de n'importe où (une autre appli, un lien SMS/QR code) —
+  // jamais fiable. `decodeURIComponent` lève sur un `%` mal formé : tout le
+  // bloc est protégé pour qu'une URL corrompue ne fasse jamais planter l'appli.
+  try {
+    // Analyse manuelle plutôt que `URL` (support incertain selon le moteur JS
+    // embarqué) : "yego://paiement?reservationId=123&..." → chemin + requête.
+    const [avantQuery, query = ''] = url.split('?');
+    const chemin = avantQuery.replace(/^[a-z][a-z0-9+.-]*:\/\//i, '').replace(/^\/+|\/+$/g, '');
+    if (chemin !== 'paiement') return;
 
-  const params = new Map<string, string>();
-  for (const paire of query.split('&')) {
-    if (!paire) continue;
-    const [cle, valeur = ''] = paire.split('=');
-    params.set(decodeURIComponent(cle), decodeURIComponent(valeur));
+    const params = new Map<string, string>();
+    for (const paire of query.split('&')) {
+      if (!paire) continue;
+      const [cle, valeur = ''] = paire.split('=');
+      params.set(decodeURIComponent(cle), decodeURIComponent(valeur));
+    }
+
+    const reservationId = Number(params.get('reservationId'));
+    if (Number.isFinite(reservationId)) emitRetourPaiement(reservationId);
+  } catch {
+    // URL mal formée : on l'ignore, le polling dans PaiementScreen reste le
+    // mécanisme fiable de toute façon.
   }
-
-  const reservationId = Number(params.get('reservationId'));
-  if (Number.isFinite(reservationId)) emitRetourPaiement(reservationId);
 }
 
 export function installerEcouteurRetourPaiement(): () => void {

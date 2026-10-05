@@ -206,6 +206,11 @@ export default function PaiementScreen({ route, navigation }: Props) {
   }
 
   async function ouvrirPageOperateur(url: string) {
+    // Défense en profondeur : `url` vient de l'API (authentifiée, HTTPS) donc
+    // on lui fait confiance en pratique, mais on n'ouvre jamais autre chose
+    // qu'une page https dans le navigateur (évite tout `file://`/schéma
+    // exotique si cette valeur était un jour corrompue côté serveur).
+    if (!/^https:\/\//i.test(url)) return;
     try {
       // openAuthSessionAsync (ASWebAuthenticationSession / Custom Tabs) ferme la
       // session toute seule dès que l'API relaie l'opérateur vers yego://paiement
