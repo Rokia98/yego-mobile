@@ -13,7 +13,7 @@ import { mesReservations, annuler } from '../api/reservations';
 import { remboursementDeReservation } from '../api/remboursements';
 import { tableVilles } from '../api/villes';
 import { extraireMessage } from '../api/erreurs';
-import { formatDate, formatHeure, formatPrix, montant } from '../format';
+import { departEstPasse, formatDate, formatHeure, formatPrix, montant } from '../format';
 import { useLangue } from '../i18n';
 import type { Dictionnaire } from '../i18n/dictionnaires';
 import { vibrer } from '../haptics';
@@ -22,10 +22,19 @@ import type { Remboursement, Reservation } from '../api/types';
 type Props = TabScreenProps<'MesTrajets'>;
 
 // Le badge reflète l'état RÉEL : pour une réservation confirmée, ce qui compte
-// pour le voyageur c'est où en est le paiement.
-function badge(r: Reservation, t: Dictionnaire): { texte: string; couleur: string; fond: string } {
+// pour le voyageur c'est où en est le paiement. `estPasse` couvre le cas où le
+// départ est déjà passé mais où l'API n'a pas (encore) basculé le statut à
+// 'expiree' — on l'affiche quand même comme telle, jamais "À payer".
+function badge(
+  r: Reservation,
+  t: Dictionnaire,
+  estPasse: boolean,
+): { texte: string; couleur: string; fond: string } {
   if (r.statut === 'annulee') return { texte: t.mesTrajets.annulee, couleur: COLORS.gray, fond: '#ECEFF1' };
   if (r.statut === 'expiree') return { texte: t.mesTrajets.expiree, couleur: COLORS.gray, fond: '#ECEFF1' };
+  if (estPasse && r.paiement?.statut !== 'paye') {
+    return { texte: t.mesTrajets.expiree, couleur: COLORS.gray, fond: '#ECEFF1' };
+  }
   switch (r.paiement?.statut) {
     case 'paye':
       return { texte: t.mesTrajets.payee, couleur: COLORS.green, fond: COLORS.greenWash };
@@ -185,11 +194,14 @@ export default function MesTrajetsScreen({ navigation }: Props) {
             </View>
           }
           renderItem={({ item, index }) => {
-            const b = badge(item, t);
-            const paye = item.paiement?.statut === 'paye';
-            const aPayer = item.statut === 'confirmee' && !paye;
             const trajet = item.depart?.trajet;
             const prixTotal = trajet ? montant(trajet.prix) * item.nombrePlaces : 0;
+            // Départ déjà passé (date + heure) : on ne peut plus payer ni annuler, même
+            // si l'API n'a pas encore basculé le statut à 'expiree' côté serveur.
+            const estPasse = !!(item.depart && trajet) && departEstPasse(item.depart!.dateDepart, trajet!.heureDepart);
+            const b = badge(item, t, estPasse);
+            const paye = item.paiement?.statut === 'paye';
+            const aPayer = item.statut === 'confirmee' && !paye && !estPasse;
             // Le suivi n'est proposé que pour une réservation encore valide
             // (jamais pour une réservation annulée ou expirée).
             const peutSuivre =
@@ -197,8 +209,12 @@ export default function MesTrajetsScreen({ navigation }: Props) {
               (item.depart?.statut === 'en_route' || item.depart?.statut === 'arrive');
             // L'API refuse l'annulation (400) une fois le départ parti (en_route/arrive)
             // ou un ticket déjà scanné à l'embarquement — on épargne l'aller-retour
-            // pour le cas détectable ici (le départ parti).
-            const peutAnnuler = item.statut === 'confirmee' && item.depart?.statut !== 'en_route' && item.depart?.statut !== 'arrive';
+            // pour les cas détectables ici (le départ parti, ou simplement son heure passée).
+            const peutAnnuler =
+              item.statut === 'confirmee' &&
+              item.depart?.statut !== 'en_route' &&
+              item.depart?.statut !== 'arrive' &&
+              !estPasse;
             return (
               <FadeIn delai={Math.min(index * 55, 300)}>
                 <Card style={styles.carte}>

@@ -108,6 +108,17 @@ export function ajouterJours(ymd: string, n: number): string {
   return versYmd(d);
 }
 
+// Combine la date du départ ("AAAA-MM-JJ" ou ISO) avec l'heure (epoch
+// "1970-01-01THH:mm", ne garder que HH:mm — même convention que `formatHeure`)
+// pour savoir si ce départ est déjà passé (plus de paiement/annulation possible).
+export function departEstPasse(dateDepart: string, heureDepart: string): boolean {
+  const jour = versDate(dateDepart);
+  const h = new Date(heureDepart);
+  const d = new Date(jour);
+  d.setHours(h.getHours(), h.getMinutes(), 0, 0);
+  return d.getTime() < Date.now();
+}
+
 // "il y a 3 min", "il y a 2 h", "hier", "12 sept."
 export function formatRelatif(iso: string, locale: Locale = 'fr-FR'): string {
   const m = MOTS[locale];
