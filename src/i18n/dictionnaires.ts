@@ -141,6 +141,8 @@ export const fr = {
     echec: 'Échec',
     payer: (montant: string) => `Payer ${montant}`,
     paiementPrecedentEchoue: 'Le paiement précédent a échoué. Choisissez un moyen et réessayez.',
+    paiementEnAttenteRelancer:
+      'Votre précédente tentative de paiement a expiré. Vérifiez le moyen et le numéro, puis payez à nouveau.',
     paiementNonConfirme: "Le paiement n'est pas encore confirmé. Validez-le sur votre téléphone puis réessayez.",
     paiementEchoueReessayez: 'Le paiement a échoué. Réessayez avec un autre moyen.',
     numeroQuiPaie: 'Numéro qui paie',
@@ -537,6 +539,8 @@ export const en: Dictionnaire = {
     echec: 'Failed',
     payer: (montant: string) => `Pay ${montant}`,
     paiementPrecedentEchoue: 'The previous payment failed. Choose a method and try again.',
+    paiementEnAttenteRelancer:
+      'Your previous payment attempt expired. Check the method and number, then pay again.',
     paiementNonConfirme: 'Payment is not confirmed yet. Confirm it on your phone, then try again.',
     paiementEchoueReessayez: 'Payment failed. Try again with another method.',
     numeroQuiPaie: 'Number paying',

@@ -79,13 +79,28 @@ export default function PaiementScreen({ route, navigation }: Props) {
     };
   }, []);
 
+  // Une demande Jèko n'est valide que ~25 min côté API (voir
+  // DEMANDE_JEKO_VALIDE_MS) — reprendre l'attente/le polling sur une demande
+  // abandonnée depuis trop longtemps ne peut jamais aboutir (le bouton tourne
+  // indéfiniment). On repropose plutôt l'écran de choix, moyen/numéro
+  // préremplis : un nouveau "Payer" relance `initierPaiement`, qui réutilise
+  // la demande si elle est encore fraîche ou en crée une neuve sinon — c'est
+  // l'API qui sait, pas le mobile.
+  function reprendrePaiementEnAttente(p: Paiement) {
+    setPaiementActuel(p);
+    const moyenConnu = MOYENS.find((m) => m.id === p.moyenPaiement)?.id;
+    if (moyenConnu) setMoyen(moyenConnu);
+    if (p.telephonePayeur) {
+      setTelephonePayeur(chiffresTelephone(p.telephonePayeur.replace(/^\+?225/, '')));
+    }
+    setErreur(t.paiement.paiementEnAttenteRelancer);
+    setEtat('choix');
+  }
+
   function demarrerDepuisPaiement(p: Paiement) {
     setPaiementActuel(p);
     if (p.jekoReference) {
-      setModeAttente(p.actionRequise === 'redirection' ? 'redirection' : 'ussd');
-      setUrlOperateur(p.urlPaiement ?? null);
-      setEtat('attente');
-      suivreParVerification();
+      reprendrePaiementEnAttente(p);
     } else {
       setModeAttente('simulation');
       setEtat('attente');
