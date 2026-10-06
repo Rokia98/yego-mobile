@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, SafeAreaView, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import type { StackScreenProps } from '../navigation/types';
 import { COLORS, RADIUS } from '../theme';
@@ -76,7 +77,7 @@ export default function NotificationsScreen(_props: Props) {
   const auMoinsUnNonLu = liste.some((n) => !n.lu);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
       <View style={styles.entete}>
         <View style={styles.retour}>
           <BoutonRetour icone="down" />

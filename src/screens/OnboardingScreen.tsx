@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   Animated,
   ScrollView,
   TouchableOpacity,
@@ -11,6 +10,7 @@ import {
   type NativeSyntheticEvent,
   type NativeScrollEvent,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Logo from '../components/Logo';
 import Button from '../components/Button';
 import {
@@ -66,7 +66,7 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.conteneur}>
+    <SafeAreaView style={styles.conteneur} edges={['top', 'bottom']}>
       <View style={styles.haut}>
         <Logo size={30} />
         <TouchableOpacity onPress={terminerOnboarding} hitSlop={12}>

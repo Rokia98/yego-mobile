@@ -15,7 +15,6 @@ import Card from '../components/Card';
 import Field from '../components/Field';
 import Button from '../components/Button';
 import PressableScale from '../components/PressableScale';
-import SelecteurLangue from '../components/SelecteurLangue';
 import { useAuth } from '../auth/AuthContext';
 import { useLangue } from '../i18n';
 import { extraireMessage } from '../api/erreurs';
@@ -74,7 +73,6 @@ export default function LoginScreen() {
         >
           <View style={styles.header}>
             <Logo size={40} />
-            <SelecteurLangue compact />
           </View>
 
           <Text style={styles.titre}>
