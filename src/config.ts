@@ -24,11 +24,15 @@ function hoteDev(): string {
     : `http://localhost:${PORT_API_DEV}`;
 }
 
+// API déployée (Render) — remplace l'ancien tunnel ngrok. Sert de secours en
+// dev (voir EXPO_PUBLIC_API_URL dans .env.example) et de valeur de prod tant
+// qu'aucun domaine propre n'est en place.
+const API_URL_PROD = 'https://yego-api.onrender.com/api/v1';
+
 // Priorité : variable d'environnement explicite > détection auto en dev > prod.
 const depuisEnv = process.env.EXPO_PUBLIC_API_URL;
 
-export const API_BASE_URL =
-  depuisEnv ?? (__DEV__ ? `${hoteDev()}/api/v1` : 'https://api.yego.ci/api/v1');
+export const API_BASE_URL = depuisEnv ?? (__DEV__ ? `${hoteDev()}/api/v1` : API_URL_PROD);
 
 if (__DEV__) {
   // eslint-disable-next-line no-console
