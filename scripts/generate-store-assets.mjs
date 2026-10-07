@@ -44,7 +44,7 @@ const banniere = `
   <rect width="1024" height="500" fill="${SOMBRE}"/>
   ${epingleAt(200, 250, 220)}
   <text x="380" y="245" font-family="Arial, Helvetica, sans-serif" font-size="92" font-weight="800" fill="${BLANC}">Y<tspan fill="${ORANGE}">è</tspan>go</text>
-  <text x="382" y="300" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="400" fill="#C7CFD6">Réservez. Payez. Embarquez.</text>
+  <text x="382" y="300" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="400" fill="#C7CFD6">Toute la Côte d'Ivoire</text>
 </svg>`;
 
 await mkdir(sortie, { recursive: true });
